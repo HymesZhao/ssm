@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.atguigu.dao.LockDao">
+ 
+ 	<!-- public Lock getLockByIdByStep(Integer id);
+ 	    id  lockName  
+     	1  	1号锁   
+ 	 -->
+ 	<select id="getLockByIdByStep" resultMap="mylockstep">
+ 		select * from t_lock where id=#{id}
+ 	</select>
+ 	<!-- collection分步查询 -->
+ 	<resultMap type="com.atguigu.bean.Lock" id="mylockstep">
+ 		<id property="id" column="id"/>
+ 		<result property="lockName" column="lockName"/>
+ 		<!-- collection指定集合类型的属性封装规则 -->
+ 		<collection property="keys"
+ 			select="com.atguigu.dao.KeyDao.getKeysByLockId"
+ 			column="{id=id}"></collection>
+ 			<!-- {key1=列名,key2=列名} -->
+ 	</resultMap>
+ 	
+ 	<!-- 
+ 		update bs_book 
+ 			set title=?,author=?,price=?,sales=?,stock=?,img_path=? 
+ 		where id=?";
+ 		
+ 		String sql = "update bs_book set";
+ 		if(employee.getTitle()){
+ 			sql+="title=?,"
+ 		}
+ 		if(){
+ 			sql + = "price=?,";
+ 		}
+ 	 -->
+ 
+ 	<!--public Lock getLockByIdSimple(Integer id);  -->
+ 	<select id="getLockByIdSimple" resultType="com.atguigu.bean.Lock">
+ 		select * from t_lock where id=#{id}
+ 	</select>
+ 	
+ 	
+ 
+ 	<!-- public Lock getLockById(Integer id); -->
+ 	<select id="getLockById" resultMap="mylock">
+ 		select l.*,k.id kid,k.`keyname`,k.`lockid` from t_lock l 
+			left join t_key k on l.`id`=k.`lockid`
+			where l.id=#{id}
+ 	</select>
+ 	
+ 	<!--
+	 	private Integer id;
+		private String lockName;
+		//查询锁子的时候把所有的钥匙也查出来
+		private List<Key> keys;
+		
+		id  lockName                  kid  keyname     lockid  
+		3  303办公室的锁子                   			3  303钥匙1           3
+     	3  303办公室的锁子                  			4  303钥匙2           3
+     	3  303办公室的锁子                   			5  303钥匙3           3
+ 	  -->
+ 	<resultMap type="com.atguigu.bean.Lock" id="mylock">
+ 		<id property="id" column="id"/>
+ 		<result property="lockName" column="lockName"/>
+ 		<!-- 
+ 		collection：定义集合元素的封装 
+ 			property="":指定哪个属性是集合属性
+ 			javaType：指定对象类型；association
+ 			ofType=""：指定集合里面元素的类型
+ 		-->
+ 		<collection property="keys" ofType="com.atguigu.bean.Key">
+ 			<!-- 标签体中指定集合中这个元素的封装规则 -->
+ 			<id property="id" column="kid"/>
+ 			<result property="keyName" column="keyname"/>
+ 		</collection>
+ 	</resultMap>
+ </mapper>

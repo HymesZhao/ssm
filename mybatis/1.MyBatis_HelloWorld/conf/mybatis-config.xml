@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <!--1、和Spring的context：property-placeholder一样 引入外部配置文件-->
+  <!--resource 从类路径下引入    url 从磁盘或者网络引入-->
+  <properties resource="dbconfig.properties"/>
+  <!--2、开启驼峰映射-->
+  <settings>
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
+  </settings>
+  <!--3、typeAlias类型起别名 javaBean起别名-->
+  <typeAliases>
+    <!--3.1、单个起别名:默认别名就是类名，不区分大小写-->
+ <!--   <typeAlias type="com.atguigu.bean.Employee"/>-->
+    <!--3.2、批量起别名-->
+    <package name="com.atguigu.bean"/>
+  </typeAliases>
+	
+  <environments default="development">
+    <environment id="development">
+      <transactionManager type="JDBC"/>
+      <!-- 配置连接池 -->
+      <dataSource type="POOLED">
+        <!--${} 取出配置文件中的值-->
+        <property name="driver" value="${driver}"/>
+        <property name="url" value="${url}"/>
+        <property name="username" value="${username}"/>
+        <property name="password" value="${password}"/>
+      </dataSource>
+    </environment>
+  </environments>
+  
+  
+  <!-- 引入我们自己编写的每一个接口的实现文件 -->
+  <mappers>
+  	<!--resource:表示从类路径下找资源  -->
+    <mapper resource="EmployeeDao.xml"/>
+  </mappers>
+</configuration>

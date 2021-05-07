@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.atguigu.dao.TeacherDao">
+	
+	<resultMap type="com.atguigu.bean.Teacher" id="teacherMap">
+		<id property="id" column="id" />
+		<result property="address" column="address" />
+		<result property="birth" column="birth_date" />
+		<result property="course" column="class_name" />
+		<result property="name" column="teacherName" />
+	</resultMap>
+	<!--public List<Teacher> getTeachers();  -->
+	<select id="getTeachers" resultMap="teacherMap">
+		select * from t_teacher
+	</select>
+	
+	<!-- public Teacher getTeacherById(Integer id); -->
+	<select id="getTeacherById" resultMap="teacherMap">
+		select * from t_teacher where id=#{id}
+	</select>
+
+</mapper>

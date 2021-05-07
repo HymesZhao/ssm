@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ <mapper namespace="com.atguigu.dao.KeyDao">
+ 	<!--public List<Key> getKeysByLockId(Integer id); 
+ 	按照锁子id查出所有的key
+ 	 -->
+ 	<select id="getKeysByLockId" resultType="com.atguigu.bean.Key">
+ 		select * from t_key where lockid=#{id}
+ 	</select>
+ 
+ 	<!-- public Key getKeyByIdSimple(Integer id); -->
+ 	<!-- 查询key的时候也可以带上锁子信息  -->
+ 	<!-- 
+ 	private Integer id;//钥匙的id
+	private String keyName;//钥匙的名
+	private Lock lock;//当前钥匙能开哪个锁；
+ 	 -->
+ 	<!--     id  keyname     lockid   -->
+ 	<select id="getKeyByIdSimple" resultMap="mykey02">
+ 		select * from t_key where id=#{id}
+ 	</select>
+ 	<resultMap type="com.atguigu.bean.Key" id="mykey02">
+ 		<id property="id" column="id"/>
+ 		<result property="keyName" column="keyname"/>
+ 		<!--告诉mybatis自己去调用一个查询查锁子
+ 		select=""：指定一个查询sql的唯一标识；mybatis自动调用指定的sql将查出的lock封装进来
+ 		public Lock getLockByIdSimple(Integer id);需要传入锁子id
+ 		告诉mybatis把哪一列的值传递过去
+ 		column：指定将哪一列的数据传递过去
+ 		  -->
+ 		<association property="lock" 
+ 			select="com.atguigu.dao.LockDao.getLockByIdSimple"
+ 			column="lockid" fetchType="lazy"></association>
+ 	</resultMap>
+ 	<!-- getKeyById(Integer) -->
+ 	<!-- 
+	 	private Integer id;//钥匙的id
+		private String keyName;//钥匙的名
+		private Lock lock;//当前钥匙能开哪个锁；
+		
+		id  keyname     lockid     lid  lockName  
+ 	 -->
+ 	<select id="getKeyById" resultMap="mykey">
+ 		select k.id,k.`keyname`,k.`lockid`,
+		       l.`id` lid,l.`lockName` from t_key k
+			left join t_lock l on k.`lockid`=l.`id`
+			where k.`id`=#{id}
+ 	</select>
+ 	<!-- 自定义封装规则：使用级联属性封装联合查询出的结果 -->
+<!--  	<resultMap type="com.atguigu.bean.Key" id="mykey">
+ 		<id property="id" column="id"/>
+ 		<result property="keyName" column="keyname"/>
+ 		<result property="lock.id" column="lid"/>
+ 		<result property="lock.lockName" column="lockName"/>
+ 	</resultMap> -->
+ 	
+ 	<!-- mybatis推荐的   <association property=""></association>-->
+ 	<resultMap type="com.atguigu.bean.Key" id="mykey">
+ 		<id property="id" column="id"/>
+ 		<result property="keyName" column="keyname"/>
+ 		<!-- 接下来的属性是一个对象，自定义这个对象的封装规则；使用association；表示联合了一个对象 -->
+ 		<!-- javaType：指定这个属性的类型 -->
+ 		<association property="lock" javaType="com.atguigu.bean.Lock">
+ 			<!-- 定义lock属性对应的这个Lock对象如何封装 -->
+ 			<id property="id" column="lid"/>
+ 			<result property="lockName" column="lockName"/>
+ 		</association>
+ 	</resultMap>
+ </mapper>
